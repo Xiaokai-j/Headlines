@@ -4,10 +4,11 @@ import router from './router'
 import ElementUI from 'element-ui' // 引入模块
 import axios from 'axios' // 引入axios
 import 'element-ui/lib/theme-chalk/index.css'// 引入样式
-
+import Components from '@/components'
 import '@/styles/index.less' // 引入样式
-
+import '@/permission' // 引入权限模块
 Vue.config.productionTip = false
+Vue.use(Components) // 注册开发自定义组件
 Vue.use(ElementUI) // 全局注册element-ui框架 一旦全局注册 所有的位置都可以使用组件
 // Vue.use实际上 会调用element-ui 里面的install方法
 

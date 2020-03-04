@@ -126,7 +126,7 @@ export default {
         }).then(result => {
           // 成功
           // 把钥匙放在兜里面，用的时候再拿
-          window.localStorage.setItem('user-token', result.data.data.token)
+          window.localStorage.setItem('user-token', result.data.token)
           // console.log(result.data.data.token)
           // 跳转到主页
           // push 和 router-link 类似 to属性 可以直接是字符串也可以是对象

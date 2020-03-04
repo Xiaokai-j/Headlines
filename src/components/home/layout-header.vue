@@ -58,17 +58,13 @@ export default {
     }
   },
   created () {
-    const token = localStorage.getItem('user-token') // 从兜里拿钥匙 也就是从缓存中取token
     //   获取用户的个人信息
     this.$axios({
-      url: '/user/profile', // 请求地址
+      url: '/user/profile' // 请求地址
       // 请求头参数 headers放置请求头参数
-      headers: {
-        Authorization: `Bearer ${token}` // 格式要求 Bearer +token
-      }
     }).then(result => {
       // 如果加载成功了 我们要将数据赋值给 userInfo
-      this.userInfo = result.data.data
+      this.userInfo = result.data
     })
   }
 }

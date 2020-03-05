@@ -4,6 +4,8 @@
  * 配置拦截器 以及其他
  * ****/
 import axios from 'axios'
+// import { promise } from 'dns'
+import router from '@/router' // 路由实例对象
 // 拦截器及其他操作
 axios.defaults.baseURL = 'http://ttapi.research.itcast.cn/mp/v1_0' // 配置公共的请求头
 
@@ -26,7 +28,19 @@ axios.interceptors.response.use(function (response) {
 // 在拦截器中需要将数据返回
   return response.data ? response.data : { } // 有的接口 没有任何的响应数据
 // 成功的时候执行
-}, function () {
+}, function (error) {
 // 失败的时候执行
+// error 是错误对象 里面包含了错误的状态码 和 响应信息
+// 401状态码 表示用户状态认证失败 用户身份不对
+// 401出现的时候 表示 拿错钥匙/钥匙过期/钥匙没拿/钥匙格式不对
+// 之前的导航守卫  校验了token 有没有
+//
+  if (error.response.status === 401) {
+    localStorage.removeItem('user-token') // 删除钥匙
+    router.push('/login') // 直接导入路由实例对象使用跳转方式和组件中的this.$router是一样的
+    //   跳回登录页
+  }
+  //   进行错误的处理
+  return Promise.reject(error)
 })
 export default axios

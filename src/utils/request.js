@@ -22,6 +22,7 @@ axios.interceptors.request.use(function (config) {
 // 如果失败了我们应该直接reject  reject会直接金进入到axios
   return Promise.reject(error)
 })
+
 // 响应拦截器的开发
 axios.interceptors.response.use(function (response) {
 // 回调函数第一个参数 是响应体

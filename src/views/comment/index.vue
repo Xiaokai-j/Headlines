@@ -86,7 +86,7 @@ export default {
           method: 'put', // 请求类型
           // query参数
           params: {
-            article_id: row.id // 要求参数的文章id
+            article_id: row.id.toString() // 要求参数的文章id
           },
           data: {
             //  body参数

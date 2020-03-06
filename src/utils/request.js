@@ -6,6 +6,7 @@
 import axios from 'axios'
 // import { promise } from 'dns'
 import router from '@/router' // 路由实例对象
+import JSONBig from 'json-bigint' // 引入地方处理大数字的包
 // 拦截器及其他操作
 axios.defaults.baseURL = 'http://ttapi.research.itcast.cn/mp/v1_0' // 配置公共的请求头
 
@@ -22,7 +23,13 @@ axios.interceptors.request.use(function (config) {
 // 如果失败了我们应该直接reject  reject会直接金进入到axios
   return Promise.reject(error)
 })
-
+// 对axios的 返回数据进行自定义处理 用json-bigint替代原来的json
+// 这主要处理id超过 大数字的时候 转化 不正确的问题 JSONBig.parse 是第三方的包 内部怎么实现的 不需要关心
+axios.defaults.transformResponse = [function (data) {
+  // 用json-bigint的转化来做
+  // 这里需要判断一下 data 是不是为空 如果为空就不能转化了
+  return data ? JSONBig.parse(data) : {}
+}]
 // 响应拦截器的开发
 axios.interceptors.response.use(function (response) {
 // 回调函数第一个参数 是响应体

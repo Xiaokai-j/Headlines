@@ -23,8 +23,11 @@ axios.interceptors.request.use(function (config) {
 // 如果失败了我们应该直接reject  reject会直接金进入到axios
   return Promise.reject(error)
 })
-// 对axios的 返回数据进行自定义处理 用json-bigint替代原来的json
+
 // 这主要处理id超过 大数字的时候 转化 不正确的问题 JSONBig.parse 是第三方的包 内部怎么实现的 不需要关心
+// 对axios的 返回数据进行自定义处理 用json-bigint替代原来的json
+// transformResponse 中要返回处理的结果
+// transformResponse 是所有请求字符串 转化成 对象的入口 在这个位置 如果处理了 相当于所有的接口都处理了
 axios.defaults.transformResponse = [function (data) {
   // 用json-bigint的转化来做
   // 这里需要判断一下 data 是不是为空 如果为空就不能转化了

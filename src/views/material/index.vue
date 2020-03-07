@@ -27,13 +27,14 @@
         <el-tab-pane label="全部素材" name='all'>            <!-- 内容   循环生成页面结构-->
             <div class="img-list">
                 <!-- 采用v-for对；list数据进行循环生成 -->
-                <el-card class='img-card' v-for="item in list" :key="item.id">
+                <el-card class='img-card' v-for="(item, index) in list" :key="item.id">
                     <!-- 放置图片  并且赋值图片效果-->
-                    <img :src="item.url" alt="">
+                    <img :src="item.url" alt=""  @click="selectImg(index)">
                         <!-- 操作栏 -->
+                        <!-- 两个图标注册点击事件 -->
                         <el-row class="operate" type="flex" align="middle" justify="space-around">
-                           <i class='el-icon-star-on'></i>
-                           <i class='el-icon-delete-solid'></i>
+                           <i @click="collectOrCancel(item)" :style="{color:item.is_collected ? 'red':'black'}" class='el-icon-star-on'></i>
+                           <i @click="delMaterial(item)" class='el-icon-delete-solid'></i>
                         </el-row>
                 </el-card>
             </div>
@@ -43,9 +44,9 @@
             <!-- 内容 -->
             <div class='img-list'>
                     <!-- 采用v-for对list数据进行循环 -->
-                    <el-card class='img-card' v-for="item in list" :key="item.id">
+                    <el-card class='img-card' v-for="(item,index) in list" :key="item.id">
                         <!-- 放置图片 并且赋值 图片地址-->
-                        <img :src="item.url" alt="">
+                        <img :src="item.url" alt="" @click="selectImg(index)">
                     </el-card>
             </div>
         </el-tab-pane>
@@ -59,6 +60,17 @@
         :page-size="page.pageSize"
         @current-change="changePage"></el-pagination>
     </el-row>
+    <!-- 放置一个el-dialog组件 -->
+    <el-dialog opened="openEnd"  :visible="dialogVisible" @close="dialogVisible = false">
+        <!-- 放置一个走马灯组件 -->
+        <el-carousel ref="myCarousel" indicator-position="outside" height="400px">
+            <!-- 幻灯片循环项  根据当前页的list 循环-->
+            <el-carousel-item v-for="item in list" :key="item.id">
+                <!-- 放置图片 -->
+                <img style="width:100%;height:100%" :src="item.url" alt="">
+            </el-carousel-item>
+        </el-carousel>
+    </el-dialog>
 </el-card>
 </template>
 
@@ -71,11 +83,56 @@ export default {
       page: {
         currentaPage: 1,
         total: 0,
-        pageSize: 4 // 每页多少条
-      }
+        pageSize: 6 // 每页多少条
+      },
+      dialogVisible: false, // 控制显示隐藏
+      clickIndex: -1 // 点击的索引
     }
   },
   methods: {
+    openEnd () {
+      // 这个时候已经打开结束 ref已经有值 可以通过ref进行设置了
+      this.$refs.myCarousel.setActiveItem(this.clickIndex) // 尝试通过这种方式设置index
+    },
+    //   点击图片时调用
+    selectImg (index) {
+      this.clickindex = index // 将索引赋值
+      this.dialogVisible = true // 打开索引
+    },
+    // 删除素材的方法
+    delMaterial (row) {
+      // 删除之前 提示一下
+      this.$confirm('您确定要删除此图片吗？', '提示').then(() => {
+        //   入过确定删除，应该调用删除接口
+        this.$axios({
+          method: 'delete', // 请求类型
+          url: `/user/images/${row.id}`
+        }).then(() => {
+        //  重新加载数据
+          this.getMaterial()
+        }).catch(() => {
+          this.$message.error('操作失败')
+        })
+      })
+    },
+    // 取消或者收藏
+    collectOrCancel (row) {
+      // 调用收藏和取消接口
+      this.$axios({
+        method: 'put', // 请求类型
+        url: `/user/images/${row.id}`,
+        data: {
+          collect: !row.is_collected
+        } // 放置body参数
+      }).then(() => {
+        //  重新加载数据
+        this.getMaterial()
+      }).catch(() => {
+        this.$message.error('操作失败')
+      })
+    },
+
+    // 文件上传
     uploadImg (params) {
       // params.file 就是需要上传的图片文件
       // 接口参数类型要求是formData
@@ -84,7 +141,7 @@ export default {
       //   开始传送上传请求
       this.$axios({
         url: '/user/images', // 请求地址
-        methods: 'post', // 上传或者新增一般都是post类型
+        method: 'post', // 上传或者新增一般都是post类型
         data // es6简写
       }).then(() => {
         //   如果成功了 应该重新来取数据
@@ -99,7 +156,7 @@ export default {
       // 将最新的页码 设置给 page 下的当前页码
       this.page.currentPage = newPage// 赋值最新页码
       // 重新拉取数据
-      this.getComment()// 获取评论
+      this.getMaterial()// 获取评论
     },
     // 获取素材数据
     getMaterial () {
@@ -109,7 +166,7 @@ export default {
           // 这个位置应该变活 根据当前页签变活
         //   activeName === 'all' 获取所有的素材  activeName = 'collect' 获取收藏素材
           collect: this.activeName === 'collect',
-          page: this.currentPage, // 取页码变量中的值
+          page: this.page.currentPage, // 取页码变量中的值
           per_page: this.page.pageSize
         }, // get参数 也就是query参数
         data: {} // data参数 放的是body参数
@@ -122,7 +179,7 @@ export default {
 
     //   切换页签
     changeTab () {
-      this.page.currentaPage = 1// 将页码重置为第一页
+      this.page.currentPage = 1// 将页码重置为第一页
       // 在切换事件中
       // 可以根据当前activeName 来决定是获取那个方面的数据
       this.getMaterial()// 直接调用获取素材的方法

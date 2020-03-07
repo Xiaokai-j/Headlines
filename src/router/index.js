@@ -28,6 +28,9 @@ const routes = [
       }, { // 素材管理路由
         path: '/home/material', // 二级路由地址
         component: () => import('@/views/material')
+      }, { // 文章列表
+        path: '/home/articles',
+        component: () => import('@/views/articles')
       }
     ]
   },

@@ -4,6 +4,7 @@ import Home from '../views/home'
 import Login from '@/views/login'
 import Homes from '@/views/home/homes'
 Vue.use(VueRouter)
+
 const routes = [
   {
     // 强制跳转
@@ -28,9 +29,12 @@ const routes = [
       }, { // 素材管理路由
         path: '/home/material', // 二级路由地址
         component: () => import('@/views/material')
-      }, { // 文章列表
-        path: '/home/articles',
-        component: () => import('@/views/articles')
+      }, {
+        path: 'articles',
+        component: () => import('@/views/articles') // 引入组件
+      }, {
+        path: 'publish/:articleId?', // 发布文章 加上问号表示 可有可无
+        component: () => import('@/views/publish') // 引入组件
       }
     ]
   },

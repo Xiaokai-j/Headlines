@@ -18,8 +18,9 @@
         </el-form-item>
         <el-form-item label="封面" prop="cover" style="margin-top:120px;">
           <!-- 单选框组 -->
-          <!-- 封面单选组 绑定的是 封面cover中的type -->
-          <el-radio-group v-model="publishForm.cover.type">
+          <!-- 封面单选组 绑定的是 封面cover中的type --> 
+		   <!-- 当类型发生变化时 触发 changeType -->
+          <el-radio-group v-model="publishForm.cover.type" @change="changeType">
             <!-- 需要给每个el-radio 加上 label属性 -->
              <el-radio :label="1">单图</el-radio>
              <el-radio :label="3">三图</el-radio>
@@ -27,7 +28,11 @@
              <el-radio :label="-1">自动</el-radio>
           </el-radio-group>
         </el-form-item>
+		<!-- 放置封面组件 -->
+		<cover-image :list="publishForm.cover.images"></cover-image>
+		
         <el-form-item label="频道" prop="channel_id">
+			
           <!-- select选择器 -->
           <el-select placeholder="请选择频道" v-model="publishForm.channel_id">
               <!-- 下拉选项 v-for 循环生成 el-option-->
@@ -73,6 +78,19 @@ export default {
     }
   },
   methods: {
+	 // 改变类型事件
+	 changeType () {
+		  // 应该根据type的值 对 images 进行控制
+		  if(this.publishForm.cover.type === 1){
+			  // 单图模式
+			  // 此时还没有选择图片 所以给一个空字符串
+			  this.publishForm.cover.images = ['']
+		  }else if(this.publishForm.cover.type=== 3 ){
+			  this.publishForm.cover.images = ['','','']//此时还没选择图片 给三个空字符串
+		  }else{
+			  this.publishForm.cover.images = [] //无图或者自动时 给一个空数组
+		  }
+	  },
     // 根据id获取文章详情数据
     getArticleById (id) {
       //  获取数据

@@ -6,6 +6,7 @@ import Homes from '@/views/home/homes'
 Vue.use(VueRouter)
 
 const routes = [
+
   {
     // 强制跳转
     path: '/',
@@ -35,6 +36,9 @@ const routes = [
       }, {
         path: 'publish/:articleId?', // 发布文章 加上问号表示 可有可无
         component: () => import('@/views/publish') // 引入组件
+      }, {
+        path: 'account', // 账户地址
+        component: () => import('@/views/account') // 账户组件
       }
     ]
   },
